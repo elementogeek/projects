@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video pipeline</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p class="shell"><a href="index.html">[..]</a></p>
+
+<h1>~/projects/video-pipeline</h1>
+<div class="eq">=========================</div>
+
+<h2>## pitch</h2>
+<p>Search, download and edit video from the terminal. Claude Code makes the editorial calls: which candidate to take, where each shot starts and ends, what gets cut. yt-dlp and ffmpeg do the work.</p>
+
+<h2>## search</h2>
+<p>Search uses yt-dlp's built-in YouTube search. It lists candidates without downloading anything.</p>
+<pre><code>yt-dlp "ytsearchN:&lt;query&gt;" --flat-playlist --print "&lt;duration&gt; | &lt;channel&gt; | &lt;title&gt; | https://youtu.be/&lt;id&gt;"</code></pre>
+<p>Claude then checks candidates. It downloads a short section or a few sample frames to see the content, and runs <code>yt-dlp -F &lt;url&gt;</code> to find the maximum height before committing to the winner.</p>
+
+<h2>## download</h2>
+<ul>
+<li><code>ytdl &lt;url&gt;</code> saves to <code>~/Downloads/</code> with a format that prefers an H.264 MP4 stream. An ffprobe check reads the video codec. H.264 is kept as is. Anything else, such as AV1, is transcoded with libx264, aac and <code>-movflags +faststart</code> to <code>&lt;title&gt; (QT).mp4</code> so it plays in QuickTime.</li>
+<li><code>ytdla</code> and the <code>ytmp3</code> alias save audio only, as MP3, to <code>~/Downloads/</code>.</li>
+<li>Editing downloads use <code>-S "res:1080,vcodec:h264,acodec:aac" -f "bv*+ba/b" --merge-output-format mp4 --no-playlist</code>, sometimes <code>res:2160</code>.</li>
+<li>Long videos are downloaded by section only, such as a 90 second window, to avoid multi-hour files.</li>
+<li>Slow or stalled downloads get <code>-N 16</code> for parallel fragments.</li>
+</ul>
+<p>Quote the URL when it contains <code>&amp;</code>. The shell functions live in <code>~/.zshrc</code>.</p>
+
+<h2>## edit</h2>
+<p>All editing is ffmpeg. Claude views images, so it picks shots by looking at them rather than by reading timestamps.</p>
+<ol>
+<li>ffprobe for duration, fps and resolution.</li>
+<li>Contact sheets: <code>fps</code>, <code>scale</code> and <code>tile</code> filters combine many frames into one image. Finer 4 to 8 fps strips cover candidate moments.</li>
+<li>Scene-cut detection lists cut timecodes, so cuts land on shot boundaries and not mid-shot.</li>
+<li>Each shot is trimmed, scaled and padded to 1920x1080, given a 40 to 60 ms audio fade in and out, and re-encoded at crf 18 with aac at 48 kHz.</li>
+<li>Shots are joined with a <code>list.txt</code> concat file.</li>
+<li>Seams are checked on a contact sheet or on single frames.</li>
+<li>Index files record each named clip with its source and in/out points, next to a tiled overview image.</li>
+</ol>
+<pre><code>ffmpeg -i in.mp4 -vf "select='gt(scene,0.30)',metadata=print:file=scenes.txt" -f null -
+ffmpeg -ss &lt;start&gt; -t &lt;dur&gt; -i in.mp4 -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,format=yuv420p" -c:v libx264 -crf 18 -c:a aac -ar 48000 shot_014.mp4
+ffmpeg -f concat -safe 0 -i list.txt -c copy out.mp4</code></pre>
+
+<h2>## what it made</h2>
+<ul>
+<li>An action-trailer re-edit from an EDL, iterated v1 to v3 after feedback on mid-shot cuts and pacing.</li>
+<li>Punch-up shots from extra searched trailers: explosions, gunfights, fight scenes and chases.</li>
+<li>Named time ranges cut from several trailers, plus a scene found by scanning an 11-minute video.</li>
+<li>A library of 73+ named action selects.</li>
+<li>A 69-shot, ~59 s reel, built with a build script kept in a session scratch folder.</li>
+<li>A 32-clip B-roll set for a pitch reel. Weak shots were swapped out, and one static shot was generated with ffmpeg.</li>
+<li>A find-similar search for a shorter multi-person clip in the same layout as a reference.</li>
+</ul>
+
+<h2>## gotchas</h2>
+<ul>
+<li>AV1 does not play in QuickTime. Prefer H.264, and transcode only as a fallback.</li>
+<li>Low-resolution sources were flagged after the fact. Check the resolution of every clip, and replace low-res sources with 1080p.</li>
+<li>Stalled downloads (2026-09-10) were diagnosed with a yt-dlp version check and test fetches. The fix was <code>-N 16</code>, and <code>--extractor-args "youtube:player_client=web_safari,tv"</code> was also tried.</li>
+<li>Cuts landed mid-shot until scene detection was added.</li>
+<li>An EDL's file names were wrong. They were checked against a second EDL before use.</li>
+<li>This ffmpeg build lacks the drawtext filter, so contact sheets have no burned-in timecodes. Position in the grid gives the time.</li>
+</ul>
+
+<footer>
+<p><a href="index.html">back to ~/projects</a></p>
+</footer>
+
+</body>
+</html>
