@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VirusPvP game</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p class="shell"><a href="index.html">[..]</a></p>
+
+<h1>~/projects/viruspvp</h1>
+<div class="eq">===================</div>
+
+<h2>## pitch</h2>
+<p>Mobile-first, turn-based hex strategy. You are a spreading virus; the opponent is an AI "Cure" that hunts you. The design goal is to be as satisfying as popping bubble wrap.</p>
+
+<figure>
+<img src="img/preview_board.png" width="600" height="696" alt="Board mockup for VirusPvP">
+<figcaption>Board mockup.</figcaption>
+</figure>
+
+<h2>## mechanics</h2>
+<ul>
+<li>9x9 flat-top hex grid with odd-column offset.</li>
+<li>19-card deck: Move, Attack, Defend, Multiply, Sacrifice, Jump, Bomb, Heal. Hand size 4.</li>
+<li>Biomass economy: start 10, cap 20, regenerates by tile count.</li>
+<li>Terrain: Viral Nest gives +1 defense, Sterile Zone gives -1.</li>
+<li>Encirclement erodes enemy tiles that are mostly surrounded by you.</li>
+<li>Capture swing: after a kill, enemy tiles mostly surrounded by the killer flip to them. Applies to both sides.</li>
+<li>Auto-spread every 2nd turn.</li>
+<li>Scoring end at turn 50: most tiles wins.</li>
+</ul>
+<p>The AI uses the same cards and the same economy. Its hand is shown face-up, and each play is telegraphed before it resolves.</p>
+
+<h2>## tech</h2>
+<ul>
+<li>Godot 4.2.2, GDScript only.</li>
+<li>All tunable values live in one autoload, <code>game_config.gd</code>.</li>
+<li>191 GUT tests, run headless.</li>
+<li>HTML5/WASM web build for browser playtests. <code>build/serve.py</code> sends the COOP/COEP headers needed for local testing.</li>
+<li>A Firebase folder is scaffolded for a future backend. Not in use yet.</li>
+<li>68 commits, first 2026-04-05, latest 2026-10-14.</li>
+</ul>
+
+<h2>## art</h2>
+<p>Direction B, "Neo Geo chunky": pixel sprites for tiles, claim splats, 9-slice HUD panels and a bitmap pixel font. The Cure is drawn as a syringe. Four directions (A to D) were mocked up side by side; B was picked.</p>
+
+<figure>
+<img src="img/compare_ABCD.png" width="2190" height="980" alt="Four art direction mockups, A to D">
+<figcaption>The four art directions that were compared.</figcaption>
+</figure>
+
+<figure>
+<img src="img/mockup_B7.png" width="540" height="960" alt="Mockup of the syringe Cure">
+<figcaption>The Cure, B7 variant.</figcaption>
+</figure>
+
+<p class="note">An earlier 16-bit "Charnel Membrane" pass (2026-07-08) was replaced by Direction B.</p>
+
+<h2>## audio</h2>
+<p>Kill sound is procedural. It is a cork click and knock, then a rising 180 to 380 Hz "bloop". Several versions were rejected in play before it was signed off.</p>
+<p>On 2026-10-14 the rest of the sound moved to a sampled WAV set, with pitch-stepped pops for capture chains, background music, and a music mute toggle in the HUD.</p>
+
+<h2>## timeline</h2>
+<ul>
+<li>2026-04: first cards, terrain and encirclement.</li>
+<li>2026-05: kamikaze Jump, and Attack kills advance into the cleared hex.</li>
+<li>2026-07-07: 8-card MVP set complete.</li>
+<li>2026-07-16: web build, and a fix for taps firing twice on touch.</li>
+<li>2026-07-17: AI plays the same cards as the player.</li>
+<li>2026-07-18: retune of encirclement and scoring.</li>
+<li>2026-10-14: sprite pass, capture swing, audio upgrade.</li>
+</ul>
+
+<h2>## status</h2>
+<p>Prototype built; balance passes are done in the sim. Current phase: Art and Polish. Next: multiple boards, then online multiplayer. Final playtest sign-off is still pending.</p>
+
+<footer>
+<p><a href="index.html">back to ~/projects</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iChat Viewer tool</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p class="shell"><a href="index.html">[..]</a></p>
+
+<h1>~/projects/ichat-viewer</h1>
+<div class="eq">=======================</div>
+
+<h2>## pitch</h2>
+<p>A browser tool that opens old Apple iChat <code>.ichat</code> transcripts that macOS and paid apps refuse to read.</p>
+<p>Live: <a href="https://elementogeek.github.io/ichat-viewer/">https://elementogeek.github.io/ichat-viewer/</a></p>
+
+<h2>## problem</h2>
+<p>Some <code>.ichat</code> files are NSKeyedArchiver binary plists with stray bytes in front of the <code>bplist00</code> magic. Standard parsers fail on them because the file does not start where they expect.</p>
+
+<h2>## how it works</h2>
+<ul>
+<li>Skips the junk before the magic bytes.</li>
+<li>Hand-decodes the bplist and the keyed archive.</li>
+<li>Renders the messages as chat bubbles, with the sender shown on both sides.</li>
+<li>Drag and drop a file onto the page.</li>
+<li>Runs 100 percent in the browser. Nothing is uploaded and there is no backend.</li>
+</ul>
+
+<h2>## usage</h2>
+<p>Open the live page and drop an <code>.ichat</code> file onto it. The transcript renders in the page.</p>
+<p>Outside the browser, <code>ichat2html.py</code> converts a <code>.ichat</code> file into a standalone <code>.html</code> file. See the repo README.</p>
+
+<h2>## tech</h2>
+<ul>
+<li>Vanilla HTML and JavaScript, no framework. The parser also runs in Node.</li>
+<li>A Python CLI converter (<code>ichat2html.py</code>) uses <code>plistlib</code> for the same conversion.</li>
+<li>Files: <code>index.html</code>, <code>ichat.js</code>, <code>ichat2html.py</code>, <code>README.md</code>.</li>
+<li>Hosted on GitHub Pages. There is no build step: the page is static files served as they are.</li>
+</ul>
+
+<h2>## history</h2>
+<p>Built on 2026-07-10 in five commits:</p>
+<ol>
+<li>Initial version.</li>
+<li>README and live URL.</li>
+<li>Show the sender on both sides of the chat.</li>
+<li>Fix blank messages caused by text wrapped in NSMutableString.</li>
+<li>Cache-busting version stamp.</li>
+</ol>
+
+<h2>## status</h2>
+<p>Shipped and complete. Development was tested against my own old exports. Those files are not in the repo and are not shown on this page.</p>
+
+
+<footer>
+<p><a href="index.html">back to ~/projects</a></p>
+</footer>
+
+</body>
+</html>

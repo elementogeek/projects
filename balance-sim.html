@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance simulation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p class="shell"><a href="index.html">[..]</a></p>
+
+<h1>~/projects/balance-sim</h1>
+<div class="eq">======================</div>
+
+<h2>## pitch</h2>
+<p>Simulate thousands of full games headless, so a card game can be tuned empirically before playtests. The simulator is part of the VirusPvP repo and runs the same Board, card and AI classes the game uses.</p>
+
+<h2>## how it runs</h2>
+<ul>
+<li><code>tools/balance_sim.gd</code> plays full games through the real classes.</li>
+<li>Three player-skill tiers: naive, greedy, strong. 100 games each.</li>
+<li>Environment knobs for sweeps: <code>SIM_GAMES</code>, <code>SIM_TIERS</code>, <code>SIM_ENCIRCLE_SHARE</code>, <code>SIM_STALEMATE_TURN</code>, <code>SIM_CAPTURE_SHARE</code>, and others.</li>
+<li>Tiers run as parallel processes.</li>
+</ul>
+
+<h2>## the story</h2>
+
+<h3>1. The game was unlosable</h3>
+<p>Sim #3 showed the game was unlosable and unfinishable. Naive players won 4 games and 96 timed out. The fix was a scoring end: most tiles wins at a turn cap. The cap was first 60, later 50.</p>
+
+<h3>2. An exploit was hiding the problem</h3>
+<p>An honest encirclement rule was implemented on 2026-07-08. Player win rate fell to 0 to 4 percent. Every earlier tuning pass had been balanced against an exploit. The sim pointed at the root cause: player expansion strangled itself.</p>
+
+<h3>3. Two knobs that failed</h3>
+<ul>
+<li>AI expansion starting earlier made the game easier, at 72 to 88 percent player wins. Elimination wins exploded, so it was reverted.</li>
+<li>Auto-spread cadence from every 2 turns to every 3 overshot to 25 to 33 percent player wins. Also reverted.</li>
+</ul>
+
+<h3>4. AI gets cards</h3>
+<p>After the AI started drawing and playing cards (2026-07-17), the sim said 100 percent player wins, with 95 to 100 eliminations per tier. Sweeps of AI regen and extra plays moved nothing.</p>
+<p>Disabling encirclement entirely dropped wins to 22 percent naive and 52 percent strong, with zero eliminations. Encirclement was the runaway engine. The landed fix combined encirclement erosion, a 0.70 share threshold and a turn cap of 50. Final numbers: naive 38 percent, greedy 66 percent, strong 69 percent.</p>
+
+<h3>5. Negative results</h3>
+<p>On 2026-10-14 capture swing and leader-slowdown ideas were tested. Comeback spread forced tile parity and pushed draws up. Nothing cleared the target of 20 percent "leader loses by turn 25". None of these were shipped. They are recorded in the research notes.</p>
+
+<h2>## lessons</h2>
+<ul>
+<li>Keep the sim on the real game classes. When the sim drifted, its results were invalid.</li>
+<li>A balance sim exposes exploits. Fixing them can move win rates a lot.</li>
+<li>Sweeps find the lever. The one that mattered here was encirclement.</li>
+<li>Write down failed experiments with their numbers, so they are not retried blindly.</li>
+</ul>
+
+<footer>
+<p><a href="index.html">back to ~/projects</a></p>
+</footer>
+
+</body>
+</html>

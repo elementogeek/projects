@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The workbench</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p class="shell"><a href="index.html">[..]</a></p>
+
+<h1>~/projects/setup</h1>
+<div class="eq">================</div>
+
+<h2>## pitch</h2>
+<p>Notes on turning a bare Mac into a workshop for game development and media work, driven by Claude Code. The docs act as shared memory across chats.</p>
+
+<h2>## engine and tools</h2>
+<ul>
+<li>Godot 4.2.2 in <code>/Applications/Godot.app</code>, with the 4.2.2 Web export templates.</li>
+<li>GUT (Godot Unit Testing), vendored in <code>addons/gut</code> and run headless.</li>
+<li>yt-dlp, installed with Homebrew.</li>
+<li>ffmpeg, already present.</li>
+<li>Python 3 for simulations and the art and audio generators.</li>
+</ul>
+
+<h2>## claude code</h2>
+<p>Claude Code drives all of the above.</p>
+<ul>
+<li>The gstack skill suite lives in <code>~/.claude/skills</code>, about 58 skills: browse, qa, review, ship, plan reviews, design, and safety guards.</li>
+<li>The superpowers plugin is the only plugin enabled in user settings.</li>
+<li>A project <code>.claude/launch.json</code> defines the preview server.</li>
+</ul>
+
+<h2>## shared memory</h2>
+<p>A <code>CLAUDE.md</code> at the workspace root is read by every Claude chat. Its rules:</p>
+<ul>
+<li>The code is the source of truth. Config tables are rewritten to match the code before they are trusted.</li>
+<li>The changelog is append-only and dated. Other chats' entries are never deleted.</li>
+<li>Godot gotchas, testing pitfalls and the web-build recipe are kept in the same file.</li>
+<li>Supporting files: an <code>AGENTS.md</code> for the game repo, a <code>TODO.md</code> backlog that is surfaced at session start, and memory notes.</li>
+</ul>
+
+<h2>## layout</h2>
+<ul>
+<li><code>~/CLAUDE/</code> is the workspace. It holds <code>CLAUDE.md</code>, the VirusPvP project, and the Python simulation scripts.</li>
+<li><code>~/ichat-viewer</code> is its own git repository.</li>
+<li>The Godot project exports a Web preset to <code>build/web</code>, which is ready for itch.io.</li>
+<li>Local web testing uses <code>build/serve.py</code>, a static server that sends the COOP/COEP headers Godot 4.2 requires.</li>
+</ul>
+
+<h2>## shell functions</h2>
+<p>Added to <code>~/.zshrc</code>:</p>
+<pre><code>ytdl &lt;url&gt;    # YouTube to ~/Downloads as H.264 MP4
+ytdla &lt;url&gt;   # audio only, as MP3</code></pre>
+<p><code>ytdl</code> keeps the H.264 download when YouTube offers it, and transcodes only when the codec is something else, such as AV1.</p>
+
+<h2>## gotchas</h2>
+<ul>
+<li>Godot 4.2 web builds need cross-origin isolation (COOP/COEP headers). A plain <code>http.server</code> never loads them.</li>
+<li>Bitmap fonts must go through the ImageFont importer; a hand-built FontFile renders tofu boxes.</li>
+</ul>
+
+<footer>
+<p><a href="index.html">back to ~/projects</a></p>
+</footer>
+
+</body>
+</html>
